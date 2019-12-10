@@ -84,6 +84,10 @@ const getNthVaporized = (inputLocations, origin) => {
   });
   console.log('workingObj', workingObj);
 
+  const sortedAngles = [...Object.keys(workingObj)].sort((a, b) => {
+    return a-b;
+  });
+  console.log('sortedAngles', sortedAngles);
   // todo - loop around 90->180, -189->0, 0->89.9
 }
 
