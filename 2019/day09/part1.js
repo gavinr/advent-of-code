@@ -11,7 +11,8 @@ const runProgram = (inn, a) => {
   var currentLocation = 0;
   var relativeBase = 0;
 
-  while (input[currentLocation] !== 99) {
+  var count = 0;
+  while (input[currentLocation] !== 99 && count < 1000000) {
     var currentValue = input[currentLocation];
     var parameterString = pad(currentValue, 5);
     var opCode = parseInt(parameterString[4]);
@@ -34,6 +35,14 @@ const runProgram = (inn, a) => {
       } else if (parameterMode === 2) {
         // relative mode
         return input[relativeBase + input[currentLocation + (i + 1)]];
+      }
+    });
+
+    parameters = parameters.map((p) => {
+      if(isNaN(p) || typeof(p) == 'undefined') {
+        return 0;
+      } else {
+        return p;
       }
     });
 
@@ -89,10 +98,19 @@ const runProgram = (inn, a) => {
       console.log("error - opCode:", opCode);
       break;
     }
+    count = count + 1;
   }
 };
 
 // console.log("RESULT: ", runProgram(input, 1));
-console.log("RESULT: ", runProgram([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99], 0));
+// console.log("RESULT: ", runProgram([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99], 0));
 // console.log("RESULT: ", runProgram([1102,34915192,34915192,7,4,7,99,0], 0));
 // console.log("RESULT: ", runProgram([104,1125899906842624,99], 0));
+// console.log("RESULT: ", runProgram([109, -1, 4, 1, 99], 0)); // should be -1
+// console.log("RESULT: ", runProgram([109, -1, 104, 1, 99], 0)); // should be 1
+// console.log("RESULT: ", runProgram([109, -1, 204, 1, 99], 0)); // should be 109
+// console.log("RESULT: ", runProgram([109, 1, 9, 2, 204, -6, 99], 0)); // should be 204
+// console.log("RESULT: ", runProgram([109, 1, 109, 9, 204, -6, 99], 0)); // should be 204
+console.log("RESULT: ", runProgram([109, 1, 209, -1, 204, -106, 99], 0)); // should be 204
+// console.log("RESULT: ", runProgram([109, 1, 3, 3, 204, 2, 99], 0)); // should be the input 
+// console.log("RESULT: ", runProgram([109, 1, 203, 2, 204, 2, 99], 9)); // should be the input
