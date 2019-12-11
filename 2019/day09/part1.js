@@ -79,7 +79,7 @@ const runProgram = (inn, a) => {
       currentLocation = currentLocation + 2;
     } else if (opCode === 4) {
       console.log("--------------------- OUTPUT:", getParam(1));
-      // return getParam(1);
+      return getParam(1);
       currentLocation = currentLocation + 2;
     } else if (opCode === 5) {
       // jump-if-true
@@ -123,7 +123,7 @@ const runProgram = (inn, a) => {
   }
 };
 
-console.log("RESULT: ", runProgram(input, 1));
+console.log("RESULT: ", runProgram(input, 1)); // answer: 2662308295
 // console.log("RESULT: ", runProgram([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99], 0));
 // console.log("RESULT: ", runProgram([1102,34915192,34915192,7,4,7,99,0], 0));
 // console.log("RESULT: ", runProgram([104,1125899906842624,99], 0));
