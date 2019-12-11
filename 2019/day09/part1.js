@@ -11,88 +11,109 @@ const runProgram = (inn, a) => {
   var currentLocation = 0;
   var relativeBase = 0;
 
+
+  const getParam = (param_num) => {
+    var imode = input[currentLocation];
+    var val = input[currentLocation + param_num];
+    var parameterString = pad(imode, 5);
+
+    var mode;
+    if(param_num === 1) {
+      mode = parameterString.charAt(2);
+    } else if (param_num === 2) {
+      mode = parameterString.charAt(1);
+    } else if (param_num === 3) {
+      mode = parameterString.charAt(0);
+    }
+
+    if(mode === "0") {
+      return input[val]
+    } else if (mode === "1") {
+      return val;
+    } else if (mode === "2") {
+      return input[val + relativeBase];
+    }
+  }
+  
+  const setParam = (param_num, set_to) => {
+    var imode = input[currentLocation];
+    var val = input[currentLocation + param_num];
+    var parameterString = pad(imode, 5);
+
+    var mode;
+    if(param_num === 1) {
+      mode = parameterString.charAt(2);
+    } else if (param_num === 2) {
+      mode = parameterString.charAt(1);
+    } else if (param_num === 3) {
+      mode = parameterString.charAt(0);
+    }
+
+    if(mode === "0") {
+      input[val] = set_to;
+    } else if (mode === "1") {
+      console.error('ERROR SHOULD NOT BE HERE');
+    } else if (mode === "2") {
+      input[val + relativeBase] = set_to;
+    }
+  }
+
   var count = 0;
-  while (input[currentLocation] !== 99 && count < 1000000) {
+  while (input[currentLocation] !== 99 && count < 10000000) {
     var currentValue = input[currentLocation];
     var parameterString = pad(currentValue, 5);
     var opCode = parseInt(parameterString[4]);
 
-    var parameterModes = [];
-    parameterModes.push(parseInt(parameterString[2]));
-    if (opCode !== 3 && opCode !== 4) {
-      parameterModes.push(parseInt(parameterString[1]));
-      parameterModes.push(parseInt(parameterString[0])); // Parameters that an instruction writes to will never be in immediate mode.
-    }
-
-    var parameters = parameterModes.map((parameterMode, i) => {
-      // 0 == position mode; 1 == immediate mode
-      if (parameterMode === 0) {
-        // position mode:
-        return input[input[currentLocation + (i + 1)]];
-      } else if (parameterMode === 1) {
-        // immediate mode
-        return input[currentLocation + (i + 1)];
-      } else if (parameterMode === 2) {
-        // relative mode
-        return input[relativeBase + input[currentLocation + (i + 1)]];
-      }
-    });
-
-    parameters = parameters.map((p) => {
-      if(isNaN(p) || typeof(p) == 'undefined') {
-        return 0;
-      } else {
-        return p;
-      }
-    });
-
     if (opCode === 1) {
       // add
-      input[input[currentLocation + 3]] = parameters[0] + parameters[1];
+      setParam(3, getParam(1) + getParam(2));
       currentLocation = currentLocation + 4;
     } else if (opCode === 2) {
-      input[input[currentLocation + 3]] = parameters[0] * parameters[1];
+      // multiply
+      setParam(3, getParam(1) * getParam(2));
+
       currentLocation = currentLocation + 4;
     } else if (opCode === 3) {
-      input[input[currentLocation + 1]] = a;
+      // input
+      setParam(1, a);
       currentLocation = currentLocation + 2;
     } else if (opCode === 4) {
-      console.log("--------------------- OUTPUT:", parameters[0]);
-      // return parameters[0];
+      console.log("--------------------- OUTPUT:", getParam(1));
+      // return getParam(1);
       currentLocation = currentLocation + 2;
     } else if (opCode === 5) {
       // jump-if-true
-      if (parameters[0] !== 0) {
-        currentLocation = parameters[1];
+      if (getParam(1) !== 0) {
+        currentLocation = getParam(2);
       } else {
         currentLocation = currentLocation + 3;
       }
     } else if (opCode === 6) {
       // jump if false
-      if (parameters[0] === 0) {
-        currentLocation = parameters[1];
+      if (getParam(1) === 0) {
+        currentLocation = getParam(2);
       } else {
         currentLocation = currentLocation + 3;
       }
     } else if (opCode === 7) {
       // less than
-      if (parameters[0] < parameters[1]) {
-        input[input[currentLocation + 3]] = 1;
+      if (getParam(1) < getParam(2)) {
+        setParam(3, 1);
       } else {
-        input[input[currentLocation + 3]] = 0;
+        setParam(3, 0);
       }
       currentLocation = currentLocation + 4;
     } else if (opCode === 8) {
       // equals
-      if (parameters[0] === parameters[1]) {
-        input[input[currentLocation + 3]] = 1;
+      if (getParam(1) === getParam(2)) {
+        setParam(3, 1);
       } else {
-        input[input[currentLocation + 3]] = 0;
+        setParam(3, 0);
       }
       currentLocation = currentLocation + 4;
     } else if (opCode === 9) {
       // modify relative base
-      relativeBase = relativeBase + input[currentLocation + 1];
+      relativeBase = relativeBase + getParam(1); // input[currentLocation + 1];
       currentLocation = currentLocation + 2;
     } else {
       console.log("error - opCode:", opCode);
@@ -102,7 +123,7 @@ const runProgram = (inn, a) => {
   }
 };
 
-// console.log("RESULT: ", runProgram(input, 1));
+console.log("RESULT: ", runProgram(input, 1));
 // console.log("RESULT: ", runProgram([109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99], 0));
 // console.log("RESULT: ", runProgram([1102,34915192,34915192,7,4,7,99,0], 0));
 // console.log("RESULT: ", runProgram([104,1125899906842624,99], 0));
@@ -111,6 +132,6 @@ const runProgram = (inn, a) => {
 // console.log("RESULT: ", runProgram([109, -1, 204, 1, 99], 0)); // should be 109
 // console.log("RESULT: ", runProgram([109, 1, 9, 2, 204, -6, 99], 0)); // should be 204
 // console.log("RESULT: ", runProgram([109, 1, 109, 9, 204, -6, 99], 0)); // should be 204
-console.log("RESULT: ", runProgram([109, 1, 209, -1, 204, -106, 99], 0)); // should be 204
-// console.log("RESULT: ", runProgram([109, 1, 3, 3, 204, 2, 99], 0)); // should be the input 
-// console.log("RESULT: ", runProgram([109, 1, 203, 2, 204, 2, 99], 9)); // should be the input
+// console.log("RESULT: ", runProgram([109, 1, 209, -1, 204, -106, 99], 0)); // should be 204
+// console.log("RESULT: ", runProgram([109, 1, 3, 3, 204, 2, 99], 2)); // should be the input 
+// console.log("RESULT: ", runProgram([109, 1, 203, 2, 204, 2, 99], 8)); // should be the input
