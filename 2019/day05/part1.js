@@ -6,7 +6,7 @@ var pad = function(n, width, z) {
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-const runProgram = (input, a) => {
+const runProgram = (inn, a) => {
   var input = [...inn]; // clone
   
   var currentLocation = 0;
