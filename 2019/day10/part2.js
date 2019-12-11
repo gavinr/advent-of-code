@@ -32,6 +32,12 @@ const input = ['#.#.##..#.###...##.#....##....###',
 '..........#..##..#..###...#..#...',
 '.#.##...#....##.....#.#...##...##'];
 
+// const input = ['.#....#####...#..',
+// '##...##.#####..##',
+// '##...#...#.#####.',
+// '..#.....#...###..',
+// '..#.#.....#....##'];
+
 const inputToLocations = (inputArray) => {
   const retArr = [];
   inputArray.forEach((rowString, i) => {
@@ -76,19 +82,59 @@ const getNthVaporized = (inputLocations, origin) => {
   allAnglesWithLocations.forEach(([angle, location]) => {
     if(!workingObj.hasOwnProperty(angle)) {
       workingObj[angle] = {
-        location: location,
-        count: 1
+        locations: [],
+        count: 0
       };
     }
     workingObj[angle]['count'] = workingObj[angle]['count'] + 1;
+    (workingObj[angle]['locations']).push(location);
   });
   console.log('workingObj', workingObj);
 
-  const sortedAngles = [...Object.keys(workingObj)].sort((a, b) => {
+  const newWorkingObj = {};
+  
+  for(key in workingObj) {
+    let newIndex = parseFloat(key) + 270.0;
+    if(newIndex >= 360.0) {
+      newIndex = newIndex - 360.0;
+    }
+    newWorkingObj[newIndex] = workingObj[key];
+    // if(key === 90.0 || key === 180.0) {
+    //   newWorkingObj[key-90.0] = workingObj[key];
+    // } else if (key === 0 || key === -90.0) {
+    //   newWorkingObj[key + 270.0] = workingObj[key];
+    // } else if (key > 90.0) {
+    //   newWorkingObj[key-90.0] = workingObj[key];
+    // } else if (key < 0) {
+    //   newWorkingObj[key + 270.0] = workingObj[key];
+    // } else if (key < 90.0 && key > 0) {
+
+    // }
+  }
+
+  const sortedAngles = [...Object.keys(newWorkingObj)].sort((a, b) => {
     return a-b;
   });
   console.log('sortedAngles', sortedAngles);
-  // todo - loop around 90->180, -189->0, 0->89.9
+  let lastPointObj = undefined;
+  let count = 0;
+  let i = 0;
+  // todo - loop around 90->180, -179->0, 0->89.9
+  while(count < 200) {
+    // loop through 200 times
+    const sortedAnglesIndex = i % sortedAngles.length;
+    const angle = sortedAngles[sortedAnglesIndex];
+    const pointObj = newWorkingObj[angle];
+    lastPointObj = pointObj; // save to use later
+
+    if(pointObj.count > 0) {
+      count++;
+      pointObj.count--;
+    }
+    i++;
+  }
+  console.log('last point obj:', lastPointObj);
+  return lastPointObj.locations;
 }
 
 const runProgram = (input) => {
@@ -103,6 +149,7 @@ const runProgram = (input) => {
   console.log('maxLocationForEach sorted', maxLocationForEach);
 
   // part 1 is above, part 2 is below:
-  return getNthVaporized(locationsArray, maxLocationForEach[0][0]);
+  const nthVaporized = getNthVaporized(locationsArray, maxLocationForEach[0][0]);
+  console.log('use closest to point of these: ', nthVaporized); // ans: [16,23]
 };
 console.log("RESULT: ", runProgram(input));
