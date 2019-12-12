@@ -15,6 +15,12 @@ const intcodeRun = (inn, a) => {
   var allResults = [];
   var currentXY = [0, 0]; // default starting
   var currentFacing = 0; // 0 = up. 1 = right. 2 = down. 3 = left
+  var currentGrid = {
+    0: {
+      0: 0
+    }
+  };
+  
 
   const getParam = param_num => {
     var imode = input[currentLocation];
@@ -126,18 +132,24 @@ const intcodeRun = (inn, a) => {
     count = count + 1;
 
     if (currentResults.length === 2) {
+      // console.log('currentResults', currentResults);
       // First, it will output a value indicating the color to paint the panel the robot is over: 0 means to paint the panel black, and 1 means to paint the panel white. Second, it will output a value indicating the direction the robot should turn: 0 means it should turn left 90 degrees, and 1 means it should turn right 90 degrees.
       allResults.push({
         location: currentXY,
         color: currentResults[0] === 0 ? "black" : "white"
       });
 
-      a = currentResults[0];
+      if(!currentGrid.hasOwnProperty(currentXY[0])) {
+        // if(!currentGrid[currentXY[0]].hasOwnProperty(currentXY[1])) {
+        currentGrid[currentXY[0]] = {};
+        // }
+      }
+      currentGrid[currentXY[0]][currentXY[1]] = currentResults[0];
 
-      // 0 = up. 1 = right. 2 = down. 3 = left
+      
       if (currentResults[1] === 0) {
         // turn left 90 degrees and move one block forward
-        if (currentFacing === 0) {
+        if (currentFacing === 0) {// 0 = up. 1 = right. 2 = down. 3 = left
           currentFacing = 3;
           currentXY = [currentXY[0] - 1, currentXY[1]];
         } else if (currentFacing === 1) {
@@ -166,19 +178,25 @@ const intcodeRun = (inn, a) => {
           currentXY = [currentXY[0], currentXY[1] + 1];
         }
       }
+
+      // set input (a) to the current color of (the new) currentXY:
+      if(currentGrid.hasOwnProperty(currentXY[0]) && currentGrid[currentXY[0]].hasOwnProperty(currentXY[1])) {
+        a = currentGrid[currentXY[0]][currentXY[1]]
+      } else {
+        a = 0;
+      }
+
+      // console.log('moved to', currentXY, ' and now facing ', currentFacing);
       currentResults = []; // done, reset
     }
   }
 
   // we want the UNIQUE results, so dedupe them:
-  const totalResultsObj = {};
-  allResults.forEach(resultObj => {
-    totalResultsObj[
-      String(resultObj.location[0]) + String(resultObj.location[1])
-    ] = true;
+  var total = 0;
+  Object.keys(currentGrid).forEach((key) => {
+    total = total + Object.keys(currentGrid[key]).length;
   });
-
-  return Object.keys(totalResultsObj).length;
+  return total;
 };
 
 const runProgram = input => {
