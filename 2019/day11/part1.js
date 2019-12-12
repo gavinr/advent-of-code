@@ -88,7 +88,7 @@ const intcodeRun = (inn, a) => {
       setParam(1, a);
       currentLocation = currentLocation + 2;
     } else if (opCode === 4) {
-      console.log("--------------------- OUTPUT:", getParam(1));
+      // console.log("--------------------- OUTPUT:", getParam(1));
       currentResults.push(getParam(1));
       currentLocation = currentLocation + 2;
     } else if (opCode === 5) {
@@ -203,7 +203,7 @@ const runProgram = input => {
   // provide 0 if the robot is over a black panel or 1 if the robot is over a white panel
   // first panel is black
   const res1 = intcodeRun(input, 0);
-  console.log("ress1", res1);
+  return res1;
 };
 
 console.log("RESULT: ", runProgram(input));
