@@ -1,3 +1,4 @@
+// prettier-ignore
 const input = [];
 
 const runProgram = (input) => {
