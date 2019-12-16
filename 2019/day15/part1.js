@@ -6,7 +6,13 @@ var grid = {
     0: 'S'
   }
 };
-var fullMaze = {}; // tree?
+var tree = {
+  'parent': null,
+  'children': [],
+  'value': 'S',
+  'xy': [0, 0]
+};
+var lastForwardTreeElement = tree;
 var curX = 0;
 var curY = 0;
 var currentPathDirections = []
@@ -18,8 +24,8 @@ const render = grid => {
     tableDomNode.removeChild(tableDomNode.firstChild);
   }
 
-  const xSize = 80;
-  const ySize = 80;
+  const xSize = 50;
+  const ySize = 50;
   // console.log("xSize", xSize);
   // console.log("ySize", ySize);
 
@@ -129,7 +135,7 @@ const setGridPlace = (x, y, direction, value) => {
     retX = x+1;
   }
 
-  render(grid);
+  // render(grid);
 
   // return new location
   return [retX, retY];
@@ -221,14 +227,36 @@ const intCode = (inn, a) => {
         // lastDirectionTry = a;
       } else if (output === 1) {
         // The repair droid has moved one step in the requested direction.
+        [curX, curY] = setGridPlace(curX, curY, lastDirectionTry, 'S');
+
         if(!reverseMode) {
           currentPathDirections.push(lastDirectionTry);
+          const newNode = {
+            parent: lastForwardTreeElement,
+            children: [],
+            value: 'S',
+            xy: [curX, curY]
+          };
+          lastForwardTreeElement.children.push(newNode);
+          lastForwardTreeElement = newNode;
+        } else {
+          // we are in reverse mode so update the tree
+          lastForwardTreeElement = lastForwardTreeElement.parent;
         }
-        [curX, curY] = setGridPlace(curX, curY, lastDirectionTry, 'S');
+        
       } else if (output === 2) {
         // The repair droid has moved one step in the requested direction; its new position is the location of the oxygen system
-        currentPathDirections.push(lastDirectionTry);
         [curX, curY] = setGridPlace(curX, curY, lastDirectionTry, 'O');
+        currentPathDirections.push(lastDirectionTry);
+        const newNode = {
+          parent: lastForwardTreeElement,
+          children: [],
+          value: 'O',
+          xy: [curX, curY]
+        };
+        lastForwardTreeElement.children.push(newNode);
+        lastForwardTreeElement = newNode;
+
       } else {
         console.error('ERROR - should not be here. ouput:', output);
       }
@@ -244,6 +272,7 @@ const intCode = (inn, a) => {
         if(curX == 0 && curY == 0) {
           // back to orgin - done
           done = true;
+          render(grid);
         } else {
           // use currentPathDirections to "reverse" us out of here
           const lastValid = currentPathDirections.pop();
@@ -304,7 +333,34 @@ const intCode = (inn, a) => {
     }
     count = count + 1;
   }
-  return; // built grid is output!
+
+
+  //
+  //
+  //
+  // go through tree, breadth-first-search
+  console.log('todo - go through tree: ', tree);
+  // let queue = [];
+  let found = false;
+  let curNodes = [tree];
+  let depth = 0;
+  while(found == false) {
+    depth = depth + 1;
+    const foundItems = curNodes.find((node) => {
+      return node.value == 'O';
+    });
+    if(foundItems) {
+      found = true;
+      console.log('FOUND: depth:', depth);
+    } else {
+      // queue the children of all current nodes
+      for(let i = 0; i < curNodes.length; i++) {
+        curNodes = curNodes.concat(curNodes[0].children);
+        curNodes.shift();
+      }
+    }
+  }
+  return depth; // built grid is output!
 };
 
 console.log("RESULT: ", intCode(input));
