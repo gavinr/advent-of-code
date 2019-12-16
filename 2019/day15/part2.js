@@ -36,12 +36,12 @@ const render = grid => {
     for (let x = (xSize/2)*(-1); x < (xSize/2); x++) {
       if(x == curX && y == curY) {
         const td = document.createElement("td");
-        td.style.cssText = "width: 3px; height: 3px;";
+        td.style.cssText = "width: 5px; height: 5px;";
         td.style["background-color"] = "red";
         tr.appendChild(td);
       } else if(x == 0 && y == 0) {
         const td = document.createElement("td");
-        td.style.cssText = "width: 3px; height: 3px;";
+        td.style.cssText = "width: 5px; height: 5px;";
         td.style["background-color"] = "yellow"; // center
         tr.appendChild(td);
       } else if(grid.hasOwnProperty(x) && grid[x].hasOwnProperty(y)) {
@@ -50,7 +50,7 @@ const render = grid => {
         
   
         const td = document.createElement("td");
-        td.style.cssText = "width: 3px; height: 3px;";
+        td.style.cssText = "width: 5px; height: 5px;";
   
         if (gridValue == 'W') {
           td.style["background-color"] = "gray"; // wall
@@ -63,7 +63,7 @@ const render = grid => {
       } else {
         // blank space
         const td = document.createElement("td");
-        td.style.cssText = "width: 3px; height: 3px;";
+        td.style.cssText = "width: 5px; height: 5px;";
         tr.appendChild(td);
       }
     }
@@ -135,13 +135,17 @@ const setGridPlace = (x, y, direction, value) => {
     retX = x+1;
   }
 
-  // render(grid);
+  render(grid);
 
   // return new location
   return [retX, retY];
 }
 
-const intCode = (inn, a) => {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const intCode = async (inn, a) => {
   var input = [...inn]; // clone
   var currentLocation = 0;
   var relativeBase = 0;
@@ -290,7 +294,7 @@ const intCode = (inn, a) => {
       lastDirectionTry = a;
 
 
-
+      await sleep(1);
       // return getParam(1);
       currentLocation = currentLocation + 2;
     } else if (opCode === 5) {
