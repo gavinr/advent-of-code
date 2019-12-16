@@ -79,16 +79,16 @@ const findUnexplored = (x, y) => {
   if(!grid.hasOwnProperty(x+1) || !(grid[x+1].hasOwnProperty(y))) {
     retUnexplored.push(4); // retUnexplored.push([x+1, y]);
   }
-  if(!grid.hasOwnProperty(x-1) || !(grid[x-1].hasOwnProperty(y))) {
-    retUnexplored.push(3); // retUnexplored.push([x-1, y]);
-  }
-
-  if(!(grid[x].hasOwnProperty(y+1))) {
-    retUnexplored.push(1); // retUnexplored.push([x, y+1]);
-  }
   if(!(grid[x].hasOwnProperty(y-1))) {
     retUnexplored.push(2); // retUnexplored.push([x, y-1]);
   }
+  if(!grid.hasOwnProperty(x-1) || !(grid[x-1].hasOwnProperty(y))) {
+    retUnexplored.push(3); // retUnexplored.push([x-1, y]);
+  }
+  if(!(grid[x].hasOwnProperty(y+1))) {
+    retUnexplored.push(1); // retUnexplored.push([x, y+1]);
+  }
+  
   return retUnexplored;
 }
 
