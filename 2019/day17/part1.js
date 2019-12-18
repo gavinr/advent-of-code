@@ -187,14 +187,44 @@ const render = grid => {
   });
 };
 
+const findIntersections = (grid) => {
+  let retIntersections = [];
+  Object.keys(grid).forEach((row) => {
+    Object.keys(grid[row]).forEach((col) => {
+      if(
+        grid.hasOwnProperty(parseInt(row)-1) &&
+        grid.hasOwnProperty(parseInt(row)+1) &&
+        grid[row].hasOwnProperty(parseInt(col)-1) && 
+        grid[row].hasOwnProperty(parseInt(col)+1)
+      ) {
+        // console.log('checking: ', `${col}, ${row}`, ':', `${grid[row-1][col]} ${grid[row+1][col]} ${grid[row][col-1]} ${grid[row][col+1]}`);
+        if(
+          grid[row][col] === '#' &&
+          grid[parseInt(row)-1][col] === '#' &&
+          grid[parseInt(row)+1][col] === '#' &&
+          grid[row][parseInt(col)-1] === '#' &&
+          grid[row][parseInt(col)+1] === '#'
+        ) {
+          retIntersections.push([parseInt(col), parseInt(row)]);
+        }
+      }
+    });
+  });
+  return retIntersections;
+}
+
 
 const runProgram = (inn) => {
   const fullOutput = intcodeRun(inn);
-  // todo - convert to grid so that we can find the intersections
-  console.log('fullOutput', fullOutput);
+  // console.log('fullOutput', fullOutput);
   toGrid(fullOutput);
-  console.log('grid:', grid);
+  // console.log('grid:', grid);
   render(grid);
+  const intersections = findIntersections(grid);
+  // console.log('intersections', intersections);
+  return intersections.reduce((acc, cur) => {
+    return acc + (cur[0] * cur[1]);
+  }, 0);
 }
 
-console.log("RESULT: ", runProgram(input));
+console.log("RESULT: ", runProgram(input)); // answer: 4220
