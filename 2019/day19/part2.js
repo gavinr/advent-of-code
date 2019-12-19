@@ -219,7 +219,7 @@ const runProgram = (input, n) => {
     }
     if(validCount >= n) {
       console.log('FOUND', lastValid);
-      return;
+      return (lastValid[0]-n-1)*10000 + lastValid[1]-n-1;
     }
   }
 
